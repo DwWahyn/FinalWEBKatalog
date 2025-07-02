@@ -13,8 +13,22 @@ class DashboardController extends Controller
     {
         $totalProduk = Produk::count();
         $totalKategori = Kategori::count();
-        $stokRendah = Produk::where('stok', '<=', 5)->count();
+        $stokRendah = Produk::where('stok', '<', 10)->count();
 
-        return view('admin.dashboard', compact('totalProduk', 'totalKategori', 'stokRendah'));
+        $kategori = Kategori::withCount('produks')->get();
+        $labels = $kategori->pluck('nama'); 
+        $data = $kategori->pluck('produks_count');
+
+        return view('admin.dashboard', compact(
+            'totalProduk',
+            'totalKategori',
+            'stokRendah',
+            'labels',
+            'data'
+        ));
     }
+
+
+
+    // return view('admin.dashboard', compact('totalProduk', 'totalKategori', 'stokRendah'));
 }

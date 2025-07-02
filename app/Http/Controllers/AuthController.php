@@ -7,14 +7,15 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
-
 class AuthController extends Controller
 {
+    // Tampilkan form registrasi
     public function registerForm()
     {
         return view('auth.register');
     }
 
+    // Proses registrasi
     public function register(Request $request)
     {
         $request->validate([
@@ -27,41 +28,52 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'user', // default user
+            'role' => 'user', // default role
         ]);
 
-        Auth::login($user); // langsung login
-        return redirect('/user/dashboard'); // redirect setelah daftar
+        Auth::login($user); // langsung login setelah registrasi
+        return redirect('/user/dashboard');
     }
+
+    // Tampilkan form login
     public function loginForm()
     {
         return view('auth.login');
     }
 
+    // Proses login: validasi nama, email, dan password
     public function login(Request $request)
     {
-        $credentials = $request->validate([
+        $request->validate([
+            'name' => ['required'],
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials)) {
+        $user = User::where('email', $request->email)
+            ->where('name', $request->name)
+            ->first();
+
+        if ($user && is_string($user->password) && Hash::check($request->password, $user->password)) {
+            Auth::login($user);
             $request->session()->regenerate();
 
-            if (Auth::user()->role === 'admin') {
-                return redirect('/admin/dashboard');
-            } else {
-                return redirect('/user/dashboard');
-            }
+            return $user->role === 'admin'
+                ? redirect('/admin/dashboard')
+                : redirect('/user/dashboard');
         }
 
         return back()->withErrors([
-            'email' => 'Email atau password salah.',
+            'email' => 'Nama, email, atau password salah.',
         ]);
     }
+
+
+    // Proses logout
     public function logout(Request $request)
     {
         Auth::logout();
+        session()->flush(); // hapus semua data session
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

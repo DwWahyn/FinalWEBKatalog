@@ -22,7 +22,7 @@
                         <td>
                             @if ($produk->stok == 0)
                                 <span class="badge bg-danger">Habis</span>
-                            @elseif ($produk->stok < 5)
+                            @elseif ($produk->stok < 10)
                                 <span class="badge bg-warning text-dark">{{ $produk->stok }} (Segera Restok)</span>
                             @else
                                 <span class="badge bg-info text-dark">{{ $produk->stok }} (Rendah)</span>

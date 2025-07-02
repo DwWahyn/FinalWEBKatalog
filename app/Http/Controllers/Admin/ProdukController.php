@@ -3,39 +3,26 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use App\Models\Produk;
 use App\Models\Kategori;
-use Illuminate\Http\Request;
 
 class ProdukController extends Controller
 {
     public function index()
     {
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Akses hanya untuk admin');
-        }
-
         $produks = Produk::with('kategori')->get();
         return view('admin.produk.index', compact('produks'));
     }
 
     public function create()
     {
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Akses hanya untuk admin');
-        }
-
         $kategoris = Kategori::all();
         return view('admin.produk.create', compact('kategoris'));
     }
 
     public function store(Request $request)
     {
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Akses hanya untuk admin');
-        }
-
         $request->validate([
             'nama' => 'required',
             'harga' => 'required|numeric',
@@ -50,7 +37,7 @@ class ProdukController extends Controller
             $file = $request->file('gambar');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('gambar_produk'), $filename);
-            $data['gambar'] = $filename; // hanya nama file
+            $data['gambar'] = $filename;
         }
 
         Produk::create($data);
@@ -60,10 +47,6 @@ class ProdukController extends Controller
 
     public function edit(string $id)
     {
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Akses hanya untuk admin');
-        }
-
         $produk = Produk::findOrFail($id);
         $kategoris = Kategori::all();
         return view('admin.produk.edit', compact('produk', 'kategoris'));
@@ -71,10 +54,6 @@ class ProdukController extends Controller
 
     public function update(Request $request, string $id)
     {
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Akses hanya untuk admin');
-        }
-
         $request->validate([
             'nama' => 'required',
             'harga' => 'required|numeric',
@@ -90,7 +69,7 @@ class ProdukController extends Controller
             $file = $request->file('gambar');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('gambar_produk'), $filename);
-            $data['gambar'] = $filename; // hanya nama file
+            $data['gambar'] = $filename;
         }
 
         $produk->update($data);
@@ -100,10 +79,6 @@ class ProdukController extends Controller
 
     public function destroy(string $id)
     {
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Akses hanya untuk admin');
-        }
-
         $produk = Produk::findOrFail($id);
         $produk->delete();
 
@@ -112,30 +87,18 @@ class ProdukController extends Controller
 
     public function show(string $id)
     {
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Akses hanya untuk admin');
-        }
-
         $produk = Produk::with('kategori')->findOrFail($id);
         return view('admin.produk.show', compact('produk'));
     }
 
     public function stokIndex()
     {
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Akses hanya untuk admin');
-        }
-
         $produks = Produk::all();
         return view('admin.stok.index', compact('produks'));
     }
 
     public function updateStok(Request $request, $id)
     {
-        if (Auth::user()->role !== 'admin') {
-            abort(403, 'Akses hanya untuk admin');
-        }
-
         $request->validate([
             'stok' => 'required|integer|min:0',
         ]);

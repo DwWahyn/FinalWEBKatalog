@@ -22,7 +22,7 @@
 {{-- FILTER & SEARCH --}}
 <div class="flex flex-col md:flex-row items-center justify-center gap-4 mb-10 px-4">
     <form method="GET" action="{{ route('user.dashboard') }}" class="flex w-full md:w-2/3">
-        <input type="text" name="cari" value="{{ request('cari') }}" 
+        <input type="text" name="search" value="{{ request('search') }}" 
                placeholder="🔍 Cari produk (contoh: Aqua, Mie, Susu...)"
                class="w-full px-5 py-3 border border-gray-300 rounded-l-full focus:ring focus:ring-green-400 outline-none shadow-sm text-sm">
         <button type="submit" class="bg-green-600 text-white px-5 py-3 rounded-r-full hover:bg-green-700 transition text-sm">
@@ -47,8 +47,8 @@
 @if(request('cari') || request('kategori'))
     <div class="text-center text-sm text-gray-600 mb-6">
         Menampilkan hasil untuk:
-        @if(request('cari'))
-            <span class="font-medium">"{{ request('cari') }}"</span>
+        @if(request('search'))
+            <span class="font-medium">"{{ request('search') }}"</span>
         @endif
         @if(request('kategori'))
             <span class="ml-2">Kategori: <strong>{{ $kategoris->find(request('kategori'))->nama ?? '-' }}</strong></span>
@@ -61,18 +61,26 @@
     @forelse ($produks as $produk)
         <div class="relative bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-xl hover:scale-[1.02] transition duration-300 overflow-hidden group">
             @php $gambarPath = public_path('gambar_produk/' . $produk->gambar); @endphp
-            @if($produk->gambar && file_exists($gambarPath))
-                <img src="{{ asset('gambar_produk/' . $produk->gambar) }}" alt="{{ $produk->nama }}" class="w-full h-48 object-cover">
-            @else
-                <img src="https://via.placeholder.com/300x200?text=No+Image" alt="Tidak ada gambar" class="w-full h-48 object-cover">
-            @endif
 
+            {{-- Gambar Produk --}}
+            <div class="h-60 w-full bg-white flex items-center justify-center p-2">
+                <img 
+                    src="{{ $produk->gambar && file_exists($gambarPath) 
+                        ? asset('gambar_produk/' . $produk->gambar) 
+                        : 'https://via.placeholder.com/300x200?text=No+Image' }}" 
+                    alt="{{ $produk->nama }}" 
+                    class="h-full w-full object-contain"
+                >
+            </div>
+
+            {{-- Label --}}
             @if($produk->stok == 0)
                 <span class="absolute top-2 left-2 bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded">Stok Habis</span>
             @elseif($loop->iteration <= 4)
                 <span class="absolute top-2 left-2 bg-yellow-400 text-black text-xs font-semibold px-2 py-1 rounded">🔥 Baru</span>
             @endif
 
+            {{-- Informasi Produk --}}
             <div class="p-4">
                 <h5 class="text-lg font-semibold mb-1 text-gray-800 truncate">{{ $produk->nama }}</h5>
                 <p class="text-green-600 font-bold text-md mb-1">Rp {{ number_format($produk->harga, 0, ',', '.') }}</p>

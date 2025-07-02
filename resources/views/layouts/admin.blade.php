@@ -3,10 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard Admin | Ulfamart</title>
+    <title>@yield('title', 'Dashboard Admin | Ulfamart')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    {{-- Google Fonts & Bootstrap --}}
+    {{-- Fonts, Bootstrap & Icons --}}
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
@@ -100,7 +100,19 @@
                 display: none;
             }
         }
+
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+        }
     </style>
+
+    @stack('styles')
 </head>
 
 <body>
@@ -139,24 +151,40 @@
             <i class="fas fa-file-alt me-2"></i> Laporan Produk
         </a>
 
-
-
         {{-- Logout --}}
-        <a href="{{ route('logout') }}"
-            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+            class="{{ request()->is('logout') ? 'active' : '' }}">
             <i class="fas fa-sign-out-alt me-2"></i> Logout
+        </a>
+
+        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+            @csrf
+        </form>
+
+        <!-- <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+    @csrf
+    <button type="submit" class="btn btn-link text-white" style="border: none; background: none; padding: 0;">
+        <i class="fas fa-sign-out-alt me-2"></i> Logout
+    </button>
+</form>
+        <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+        <i class="fas fa-sign-out-alt me-2"></i> Logout
         </a>
         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none;">
             @csrf
-        </form>
+        </form> -->
     </div>
 
     {{-- Main Content --}}
     <div class="main-content">
         @yield('content')
     </div>
-     @yield('scripts')
 
+    {{-- JavaScript --}}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    @stack('scripts')
+    @yield('scripts')
 </body>
 
 </html>
